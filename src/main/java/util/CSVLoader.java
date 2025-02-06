@@ -1,32 +1,40 @@
 package util;
 
 import model.Song;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import repository.SongRepository;
-
-import java.io.BufferedReader;
 import java.io.FileReader;
-import java.time.LocalDate;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CSVLoader {
     public static void loadSongs(String csvFilePath, SongRepository repo) {
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
-            String line;
-            br.readLine();
+        try (FileReader reader = new FileReader(csvFilePath);
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                String artist = data[0];
-                String track = data[1];
-                String date = data[2];
-                String genre = data[3];
+            for (CSVRecord record : csvParser) {
+                Integer id = Integer.parseInt(record.get("id"));
+                String artist = record.get("artist_name");
+                String track = record.get("track_name");
+                String date = record.get("release_date");
+                String genre = record.get("genre");
+                String lyrics = record.get("lyrics");
+                Integer len = Integer.parseInt(record.get("len"));
 
-                double[] features = new double[data.length - 8];
-                for (int i = 6; i < 28; i++) {
-                    features[i-6] = Double.parseDouble(data[i]);
+                double[] features = new double[22];
+                for (int i = 0; i < 22; i++) {
+                    features[i] = Double.parseDouble(record.get("feature" + (i + 1)));
                 }
-                repo.save(new Song(artist, track,date, genre, features));
+
+                String topic = record.get("topic");
+                Float age = Float.parseFloat(record.get("age"));
+
+                repo.save(new Song(id, artist, track, date, genre, lyrics, len, features, topic, age));
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

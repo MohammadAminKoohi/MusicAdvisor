@@ -4,7 +4,11 @@ CREATE TABLE songs (
                        id SERIAL PRIMARY KEY,
                        artist_name TEXT,
                        track_name TEXT,
-                       release_date DATE,
+                       release_date TEXt,
                        genre TEXT,
-                       features VECTOR(24)  -- 24-dimensional feature vector
+                       lyrics TEXT,
+                       len INT,
+                       features VECTOR(22)  ,
+                       topic TEXT ,
+                       age FLOAT
 );

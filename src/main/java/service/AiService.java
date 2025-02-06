@@ -1,47 +1,79 @@
 package service;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.OutputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class AiService {
-    private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String API_KEY = "your_api_key"; // Replace with actual API key
+    private static final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    private static final String API_KEY = "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";  // Replace with your key
+    private static final String REFERER = "<YOUR_SITE_URL>";       // Optional: Your site URL
+    private static final String TITLE = "<YOUR_SITE_NAME>";        // Optional: Your site title
 
-    public String generateSearchQuery(String userInput) {
+    /**
+     * Sends the user input to OpenRouter AI and retrieves a structured query for the database.
+     * @param userInput The text input from the user.
+     * @return A query string to use in the database.
+     */
+    public String generateQuery(String userInput) {
         try {
-            URL url = new URL(API_URL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
-            conn.setDoOutput(true);
-
+            // Create the JSON request body
             JSONObject requestBody = new JSONObject();
-            requestBody.put("model", "gpt-4");
-            requestBody.put("messages", new JSONObject[]{
-                    new JSONObject().put("role", "system").put("content", "Convert user input into a structured query."),
-                    new JSONObject().put("role", "user").put("content", userInput)
-            });
+            requestBody.put("model", "deepseek/deepseek-r1:free");
 
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(requestBody.toString().getBytes(StandardCharsets.UTF_8));
+            // Create the "messages" array
+            JSONArray messages = new JSONArray();
+            JSONObject message = new JSONObject();
+            message.put("role", "user");
+            message.put("content", "Convert this user request into a structured query: " + userInput);
+            messages.put(message);
+
+            requestBody.put("messages", messages);
+
+            // Open HTTP connection
+            URL url = new URL(API_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Authorization", "Bearer " + API_KEY);
+            connection.setRequestProperty("HTTP-Referer", REFERER);
+            connection.setRequestProperty("X-Title", TITLE);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // Send request body
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = requestBody.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
             }
 
-            InputStream responseStream = conn.getInputStream();
-            Scanner scanner = new Scanner(responseStream, StandardCharsets.UTF_8);
+            // Read response
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                System.err.println("Error: API response code " + responseCode);
+                return null;
+            }
+
+            Scanner scanner = new Scanner(connection.getInputStream(), "utf-8");
             String response = scanner.useDelimiter("\\A").next();
+            System.out.println("Response: " + response);
+            System.out.println("--------------------------");
             scanner.close();
 
+            // Parse JSON response
             JSONObject jsonResponse = new JSONObject(response);
-            return jsonResponse.getJSONArray("choices").getJSONObject(0).getString("content");
+            JSONArray choices = jsonResponse.getJSONArray("choices");
+            if (choices.length() > 0) {
+                return choices.getJSONObject(0).getJSONObject("message").getString("content");
+            }
 
         } catch (Exception e) {
-            throw new RuntimeException("Error calling AI API", e);
+            e.printStackTrace();
         }
+
+        return null;  // Return null if API call fails
     }
 }
