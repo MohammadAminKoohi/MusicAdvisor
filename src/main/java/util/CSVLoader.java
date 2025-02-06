@@ -42,7 +42,6 @@ public class CSVLoader {
                 String lyrics = record.get("lyrics");
                 Integer len = Integer.parseInt(record.get("len"));
 
-                // Extract features dynamically
                 double[] features = new double[FEATURE_NAMES.length];
                 for (int i = 0; i < FEATURE_NAMES.length; i++) {
                     features[i] = Double.parseDouble(record.get(FEATURE_NAMES[i]));
