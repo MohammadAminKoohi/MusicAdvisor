@@ -17,7 +17,7 @@ public class Main {
         PgVectorRepository repo = new PgVectorRepository(conn);
         AiService ai = new AiService();
         MusicAdvisor advisor = new MusicAdvisor(ai, repo);
-        CSVLoader.loadSongs("./songs.csv", repo);
+//        CSVLoader.loadSongs("./songs.csv", repo);
 
 
         Scanner scanner = new Scanner(System.in);
