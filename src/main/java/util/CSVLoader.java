@@ -24,7 +24,7 @@ public class CSVLoader {
                 for (int i = 6; i < 28; i++) {
                     features[i-6] = Double.parseDouble(data[i]);
                 }
-                repo.save(new Song(artist, track, date, genre, features));
+                repo.save(new Song(artist, track,date, genre, features));
             }
         } catch (Exception e) {
             e.printStackTrace();

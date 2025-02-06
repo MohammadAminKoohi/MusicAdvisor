@@ -6,11 +6,11 @@ import java.util.Arrays;
 public class Song {
     private String artistName;
     private String trackName;
-    private LocalDate releaseDate;
+    private String releaseDate;
     private String genre;
     private double[] features;  // Numeric attributes as a vector
 
-    public Song(String artistName, String trackName, LocalDate releaseDate, String genre, double[] features) {
+    public Song(String artistName, String trackName, String releaseDate, String genre, double[] features) {
         this.artistName = artistName;
         this.trackName = trackName;
         this.releaseDate = releaseDate;

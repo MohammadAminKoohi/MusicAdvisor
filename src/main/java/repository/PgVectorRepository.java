@@ -2,15 +2,14 @@ package repository;
 
 import model.Song;
 import util.VectorUtils;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PgSongRepository implements SongRepository {
+public class PgVectorRepository implements SongRepository {
     private final Connection connection;
 
-    public PgSongRepository(Connection connection) {
+    public PgVectorRepository(Connection connection) {
         this.connection = connection;
     }
 

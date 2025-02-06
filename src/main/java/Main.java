@@ -1,10 +1,8 @@
 package main;
 
-import model.Song;
-import repository.PgSongRepository;
-import service.AiService;
+import repository.PgVectorRepository;
+import service.AIService;
 import service.MusicAdvisor;
-import util.CSVLoader;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,8 +12,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws Exception {
         Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/musicdb", "user", "password");
-        PgSongRepository repo = new PgSongRepository(conn);
-        AiService ai = new AiService();
+        PgVectorRepository repo = new PgVectorRepository(conn);
+        AIService ai = new AIService();
         MusicAdvisor advisor = new MusicAdvisor(ai, repo);
 
         Scanner scanner = new Scanner(System.in);
