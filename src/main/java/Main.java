@@ -1,5 +1,3 @@
-package main;
-
 import model.Song;
 import repository.PgVectorRepository;
 import service.AiService;
@@ -17,14 +15,14 @@ public class Main {
         PgVectorRepository repo = new PgVectorRepository(conn);
         AiService ai = new AiService();
         MusicAdvisor advisor = new MusicAdvisor(ai, repo);
-//        CSVLoader.loadSongs("./songs.csv", repo);
+//           CSVLoader.loadSongs("./songs.csv", repo);
 
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("Describe the kind of music you like:");
         String userInput = scanner.nextLine();
 
-        List<Song> recommendations = advisor.recommendSongs(userInput);
+        List<String> recommendations = advisor.recommendSongs(userInput);
         recommendations.forEach(System.out::println);
     }
 }

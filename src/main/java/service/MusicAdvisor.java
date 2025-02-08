@@ -15,10 +15,8 @@ public class MusicAdvisor {
         this.songRepo = songRepo;
     }
 
-    public List<Song> recommendSongs(String userInput) {
+    public List<String> recommendSongs(String userInput) {
         String query = aiService.generateQuery(userInput);
-        System.out.println("Generated query: " + query);
-        double[] queryVector = VectorUtils.extractVector(query);
-        return songRepo.findSimilarSongs(queryVector, 10);
+        return songRepo.findSimilarSongs(query);
     }
 }

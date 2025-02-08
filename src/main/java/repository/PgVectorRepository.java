@@ -37,21 +37,23 @@ public class PgVectorRepository implements SongRepository {
 
 
     @Override
-    public List<Song> findSimilarSongs(double[] queryVector, int limit) {
-        String sql = "SELECT artist_name, track_name, genre FROM songs ORDER BY features <-> ?::vector LIMIT ?";
-        List<Song> results = new ArrayList<>();
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, VectorUtils.vectorToString(queryVector));
-            stmt.setInt(2, limit);
-
-            ResultSet rs = stmt.executeQuery();
+    public List<String> findSimilarSongs(String query) {
+        List<String> results = new ArrayList<>();
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                results.add(new Song(Integer.parseInt(rs.getString("id")), rs.getString("artist_name"), rs.getString("track_name"), rs.getString("release_date"), rs.getString("genre"), rs.getString("lyrics"), rs.getInt("len"), VectorUtils.parseVector(rs.getString("features")), rs.getString("topic"), Float.parseFloat(rs.getString("age"))));
+                int id = rs.getInt("id");
+                String artist = rs.getString("artist_name");
+                String track = rs.getString("track_name");
+                String date = rs.getString("release_date");
+
+                results.add(String.format("%d: %s - %s (%s)", id, artist, track, date));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error finding similar songs", e);
         }
+
+
 
         return results;
     }
